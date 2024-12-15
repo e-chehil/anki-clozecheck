@@ -116,7 +116,6 @@
 
 </script>
 
-
 <!-- 背面内容模板 -->
 
 <div class="qu">---- <i>Question</i> ----</div>
@@ -261,23 +260,20 @@
 <style type="text/css">
 .card {
     padding: 10px 5px 15px;
-    font-family: 'georgia', 'Yasong', system-ui, Times, 'Times New Roman', serif;
+    font-family: 'Georgia', 'Yasong', Arial, serif;
     font-size: 25px;
+    text-align: center;
     color: #000;
     background: #ebedec;
 }
 
 .qu {
     font-size: 30px;
-    font-style: oblique;
-    text-align: center;
     margin-bottom: 15px;
 }
 
 .an {
     font-size: 30px;
-    font-style: oblique;
-    text-align: center;
     margin: 15px 0;
 }
 
@@ -288,17 +284,16 @@
 }
 
 .Tips {
-    min-height: 24px;
     border-top: 1px solid #FD7013;
-    padding: 17px;
+    padding: 15px;
     white-space: pre-line;
     font-size: 20px;
     line-height: 30px;
-    font-family: 'SBook', 'Youkai', system-ui, Times, 'Times New Roman', serif;
+    font-family: 'Sassoon Book', 'Youkai';
     text-align: left;
     color: #222831;
     background: #FFFFF2;
-    box-shadow: 2px 2px 5px #aaaaaa;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6);
     margin-top: 15px;
 }
 
@@ -307,7 +302,7 @@
     color: #008792;
     padding: 0.06em 0.4em;
     border-bottom: 2px solid;
-    font-family: 'SMontessori', 'Jiashu', system-ui, Arial, sans-serif;
+    font-family: 'Sassoon Montessori', 'Jiashu';
     text-align: center;
     font-weight: bold;
     letter-spacing: 0.06em;
@@ -344,7 +339,7 @@
     transition: opacity 0.3s ease;
     max-width: 80%;
     white-space: nowrap;
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
 }
 
 .tooltip-content::after {
@@ -386,7 +381,7 @@
     border-top: 1px solid #f9a825;
     color: #ebedec;
     background:#1e1e1e;
-    box-shadow: 2px 2px 5px #000000;
+    box-shadow: none;
 }
 
 .nightMode .cloze {
@@ -397,13 +392,17 @@
     color: #121212;
 }
 
+.nightMode .tooltip-content {
+    box-shadow: none;
+}
+
 @font-face {
   font-family: 'Jiashu';
   src: url("_HYJiaShu-55U.ttf");
 }
 
 @font-face {
-  font-family: 'SMontessori';
+  font-family: 'Sassoon Montessori';
   src: url("_SassoonMontessoriW01Regular.ttf");
 }
 
@@ -413,7 +412,7 @@
 }
 
 @font-face {
-  font-family: 'SBook';
+  font-family: 'Sassoon Book';
   src: url("_SassoonBookW01Regular.ttf");
 }
 
