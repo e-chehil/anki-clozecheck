@@ -1,6 +1,6 @@
 <!-- 正面内容模板 -->
 
-<div class="qu">--- Question ---</div>
+<div class="qu">---- <i>Question</i> ----</div>
 <div class="question">{{Front}}</div>
 
 <script>
@@ -117,20 +117,19 @@
 </script>
 
 
-
 <!-- 背面内容模板 -->
 
-<div class="qu">--- Question ---</div>
+<div class="qu">---- <i>Question</i> ----</div>
 <div class="question">{{Front}}</div>
 
 <div class=slide>
-    {{#Back}}
-        <div class=an>--- Answers ---</div>
-        <div class=answer>{{Back}}</div>
-    {{/Back}}
-    {{#Tips}}
-        <div class=Tips>{{Tips}}</div>
-    {{/Tips}}
+	{{#Back}}
+		<div class=an>---- <i>Answers</i> ----</div>
+		<div class=answer>{{Back}}</div>
+	{{/Back}}
+	{{#Tips}}
+		<div class=Tips>{{Tips}}</div>
+	{{/Tips}}
 </div>
 
 <script>
