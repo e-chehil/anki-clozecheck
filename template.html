@@ -1,18 +1,65 @@
 <!-- 正面内容模板 -->
 
-<div class=qu>—— Question ——</div>
-<div class=question>{{QUESTION}}</div>
+<div class="qu">--- Question ---</div>
+<div class="question">{{Front}}</div>
 
-<script type="text/javascript">
-    document.querySelectorAll('.question').forEach((qu) => {
-        qu.innerHTML = qu.innerHTML.replace(
+<script>
+    document.querySelectorAll('.question, .answer').forEach((el) => {
+        el.innerHTML = el.innerHTML.replace(
+            /\[([^\]]+)\]\("([^"]+)"\)/g,
+            `<span class="tooltip-container">$1<span class="tooltip-content">$2</span></span>`
+        ).replace(
             /`((?:.|\r?\n)+?)`/g,
-            `<span class="cloze" onclick="toggleCloze(this)">
-                <span class="key" style="opacity:0">$1</span>
-                <span class="entry" style="display:none;" contenteditable="true"></span>
-            </span>`
+            `<span class="cloze" onclick="toggleCloze(this)"><span class="key" style="opacity:0">$1</span><span class="entry" style="display:none;" contenteditable="true"></span></span>`
         );
+
+        el.querySelectorAll('.tooltip-container').forEach((tooltip) => {
+            const tooltipContent = tooltip.querySelector('.tooltip-content');
+            tooltip.addEventListener('click', (e) => {    
+                if (tooltipContent.style.visibility === 'visible') {
+                    tooltipContent.style.opacity = 0;
+                    tooltipContent.style.visibility = 'hidden';
+                } else {
+                    adjustTooltipPosition(tooltip, tooltipContent);
+                    tooltipContent.style.visibility = 'visible';
+                    tooltipContent.style.opacity = 1;
+                }
+                e.stopPropagation();
+            });
+        });
     });
+
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.tooltip-content').forEach((tooltipContent) => {
+            tooltipContent.style.opacity = 0;
+            tooltipContent.style.visibility = 'hidden';
+        });
+    });
+
+    function adjustTooltipPosition(tooltip, tooltipContent) {
+        const tooltipRect = tooltip.getBoundingClientRect();
+        let contentRect = tooltipContent.getBoundingClientRect();
+        const pageWidth = window.innerWidth;
+
+        const defaultLeft = tooltipRect.left + (tooltipRect.width - contentRect.width) / 2;
+        const adjustedLeft = Math.max(10, Math.min(defaultLeft, pageWidth - contentRect.width - 10));
+        tooltipContent.style.left = `${adjustedLeft}px`;
+        tooltipContent.style.whiteSpace = 'normal';
+        contentRect = tooltipContent.getBoundingClientRect();
+
+        let adjustedTop = tooltipRect.top - contentRect.height - 10;
+        if (adjustedTop < 0) {
+            adjustedTop = tooltipRect.bottom + 10;
+            tooltipContent.style.setProperty('--tooltip-after-top', '-8px');
+            tooltipContent.style.setProperty('--tooltip-after-bottom', 'auto');
+            tooltipContent.style.setProperty('--tooltip-after-border-top', 'none');
+            tooltipContent.style.setProperty('--tooltip-after-border-bottom', '8px solid black');
+        }
+        tooltipContent.style.top = `${adjustedTop}px`;
+
+        const arrowOffset = defaultLeft - adjustedLeft;
+        tooltipContent.style.setProperty('--tooltip-after-left', `${arrowOffset}px`);
+    }
 
     function toggleCloze(cloze, allowInput = true, allowSubmitOnEnter = false, allowRepeat = true) {
         const key = cloze.querySelector(".key");
@@ -46,8 +93,8 @@
         entry.addEventListener("keydown", (event) => {
             if (event.key === "Backspace") event.stopPropagation();
             if (allowSubmitOnEnter && event.key === "Enter") {
-                event.preventDefault(); // 防止回车换行
-                entry.blur(); // 提交答案
+                event.preventDefault();
+                entry.blur();
             }
         });
 
@@ -73,18 +120,130 @@
 
 <!-- 背面内容模板 -->
 
-{{FrontSide}}
+<div class="qu">--- Question ---</div>
+<div class="question">{{Front}}</div>
+
 <div class=slide>
-    {{#ANSWER}}
-        <div class=an>—— Answers ——</div>
-        <div class=answer>{{ANSWER}}</div>
-    {{/ANSWER}}
-    {{#TIPS}}
-        <div class=Tips><ti>TIPS</ti>{{TIPS}}</div>
-    {{/TIPS}}
+    {{#Back}}
+        <div class=an>--- Answers ---</div>
+        <div class=answer>{{Back}}</div>
+    {{/Back}}
+    {{#Tips}}
+        <div class=Tips>{{Tips}}</div>
+    {{/Tips}}
 </div>
 
-<script type="text/javascript">
+<script>
+    document.querySelectorAll('.question, .answer').forEach((el) => {
+        el.innerHTML = el.innerHTML.replace(
+            /\[([^\]]+)\]\("([^"]+)"\)/g,
+            `<span class="tooltip-container">$1<span class="tooltip-content">$2</span></span>`
+        ).replace(
+            /`((?:.|\r?\n)+?)`/g,
+            `<span class="cloze" onclick="toggleCloze(this)"><span class="key" style="opacity:0">$1</span><span class="entry" style="display:none;" contenteditable="true"></span></span>`
+        );
+
+        el.querySelectorAll('.tooltip-container').forEach((tooltip) => {
+            const tooltipContent = tooltip.querySelector('.tooltip-content');
+            tooltip.addEventListener('click', (e) => {    
+                if (tooltipContent.style.visibility === 'visible') {
+                    tooltipContent.style.opacity = 0;
+                    tooltipContent.style.visibility = 'hidden';
+                } else {
+                    adjustTooltipPosition(tooltip, tooltipContent);
+                    tooltipContent.style.visibility = 'visible';
+                    tooltipContent.style.opacity = 1;
+                }
+                e.stopPropagation();
+            });
+        });
+    });
+
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.tooltip-content').forEach((tooltipContent) => {
+            tooltipContent.style.opacity = 0;
+            tooltipContent.style.visibility = 'hidden';
+        });
+    });
+
+    function adjustTooltipPosition(tooltip, tooltipContent) {
+        const tooltipRect = tooltip.getBoundingClientRect();
+        let contentRect = tooltipContent.getBoundingClientRect();
+        const pageWidth = window.innerWidth;
+
+        const defaultLeft = tooltipRect.left + (tooltipRect.width - contentRect.width) / 2;
+        const adjustedLeft = Math.max(10, Math.min(defaultLeft, pageWidth - contentRect.width - 10));
+        tooltipContent.style.left = `${adjustedLeft}px`;
+        tooltipContent.style.whiteSpace = 'normal';
+        contentRect = tooltipContent.getBoundingClientRect();
+
+        let adjustedTop = tooltipRect.top - contentRect.height - 10;
+        if (adjustedTop < 0) {
+            adjustedTop = tooltipRect.bottom + 10;
+            tooltipContent.style.setProperty('--tooltip-after-top', '-8px');
+            tooltipContent.style.setProperty('--tooltip-after-bottom', 'auto');
+            tooltipContent.style.setProperty('--tooltip-after-border-top', 'none');
+            tooltipContent.style.setProperty('--tooltip-after-border-bottom', '8px solid black');
+        }
+        tooltipContent.style.top = `${adjustedTop}px`;
+
+        const arrowOffset = defaultLeft - adjustedLeft;
+        tooltipContent.style.setProperty('--tooltip-after-left', `${arrowOffset}px`);
+    }
+
+    function toggleCloze(cloze, allowInput = true, allowSubmitOnEnter = false, allowRepeat = true) {
+        const key = cloze.querySelector(".key");
+        const entry = cloze.querySelector(".entry");
+
+        if (entry.style.display === "none") {
+            if (allowInput) {
+                key.style.display = "none";
+                entry.style.display = "inline";
+
+                if (allowRepeat) {
+                    entry.style.color = "";
+                    entry.textContent = "";
+                    entry.contentEditable = true;
+                }
+
+                if (entry.contentEditable === "true") {
+                    entry.focus();
+                    attachEntryEvents(entry, key, cloze, allowSubmitOnEnter);
+                }
+            } else {
+                key.style.opacity = 1 - key.style.opacity;
+            }
+        } else {
+            entry.style.display = "none";
+            key.style.display = "inline";
+        }
+    }
+
+    function attachEntryEvents(entry, key, cloze, allowSubmitOnEnter) {
+        entry.addEventListener("keydown", (event) => {
+            if (event.key === "Backspace") event.stopPropagation();
+            if (allowSubmitOnEnter && event.key === "Enter") {
+                event.preventDefault();
+                entry.blur();
+            }
+        });
+
+        entry.onblur = () => {
+            const answer = entry.textContent.trim();
+            key.style.opacity = 1;
+            entry.contentEditable = false;
+
+            if (answer === key.textContent.trim()) {
+                entry.style.color = "SeaGreen";
+                entry.textContent = `${answer}✔`;
+                cloze.onclick = null;
+            } else {
+                entry.style.color = "IndianRed";
+                entry.textContent = `${answer}✘`;
+            }
+        };
+    }
+
     document.querySelectorAll('.key').forEach((key) => {
         key.style.opacity = 1;
         key.style.display = "inline";
@@ -93,6 +252,7 @@
     document.querySelectorAll('.entry').forEach((entry) => {
         entry.style.display = "none";
     });
+
 </script>
 
 
@@ -100,123 +260,172 @@
 <!-- 样式 -->
 
 <style type="text/css">
-    @font-face { font-family: STsong; src: url('_STsong.TTF'); }
-    @font-face { font-family: STfangsong; src: url('_STfangsong.TTF'); }
-    @font-face { font-family: kt; src: url('_kt.ttf'); }
+.card {
+    padding: 10px 5px 15px;
+    font-family: 'georgia', 'Yasong', system-ui, Times, 'Times New Roman', serif;
+    font-size: 25px;
+    color: #000;
+    background: #ebedec;
+}
 
-    .card {
-        padding: 15px 20px;
-        font-family:STsong, Arial, serif;
-        font-size: 25px;
-        color: #000;
-        background: #ebedec; 
-    }
+.qu {
+    font-size: 30px;
+    font-style: oblique;
+    text-align: center;
+    margin-bottom: 15px;
+}
 
-    .qu {
-        font: 30px Times;
-        font-style: oblique;
-        text-align: center;
-        margin-bottom: 30px
-    }
+.an {
+    font-size: 30px;
+    font-style: oblique;
+    text-align: center;
+    margin: 15px 0;
+}
 
-    .an {
-        font: 30px Times;
-        font-style: oblique;
-        text-align: center;
-        margin: 30px 0;
-    }
+.question, .answer {
+    color: #4c5870;
+    line-height: 1.6;
+    text-align: left;
+}
 
-    .question {
-        color: #4c5870;
-        font-weight: bolder;
-        letter-spacing: 0.016em;
-        line-height: 150%;
-        text-align: justify
-    }
+.Tips {
+    min-height: 24px;
+    border-top: 1px solid #FD7013;
+    padding: 17px;
+    white-space: pre-line;
+    font-size: 20px;
+    line-height: 30px;
+    font-family: 'SBook', 'Youkai', system-ui, Times, 'Times New Roman', serif;
+    text-align: left;
+    color: #222831;
+    background: #FFFFF2;
+    box-shadow: 2px 2px 5px #aaaaaa;
+    margin-top: 15px;
+}
 
-    .answer {
-        color: #4c5870;
-        font-weight: bolder;
-        letter-spacing: 0.016em;
-        line-height: 150%;
-        text-align: justify
-    }
+.cloze {
+    cursor: pointer;
+    color: #008792;
+    padding: 0.06em 0.4em;
+    border-bottom: 2px solid;
+    font-family: 'SMontessori', 'Jiashu', system-ui, Arial, sans-serif;
+    text-align: center;
+    font-weight: bold;
+    letter-spacing: 0.06em;
+}
 
-    ti{
-        border-radius: 10px;
-        padding: 4px 5px 4px 5px;
-        margin-right: 4px; 
-        font: bold 10px Arial;
-        text-align: center;
-        letter-spacing: 1px;
-        color: #ebedec;
-        background: #FD7013;
-    }
+.tooltip-container {
+    line-height: normal;
+    font-weight: bold;
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 2px 4px;
+    margin: 0 0.2em;
+    background-color: rgb(209, 134, 71);
+    color: #ebedec;
+    border-radius: 16px;
+    font-size: 64%;
+    user-select: none;
+}
 
-    .Tips{
-        min-height: 24px;
-        border-top: 1px solid #FD7013;
-        padding: 17px;
-        white-space: pre-line;
-        font-size: 20px;
-        line-height: 30px; 
-        font-family: STfangsong;
-        font-weight: bold;
-        text-align: left;
-        color: #222831;
-        background:#FFFFF2;
-        box-shadow: 2px 2px 5px #aaaaaa;
-        margin-top: 30px;
-    }
+.tooltip-content {
+    line-height: normal;
+    font-weight: normal;
+    visibility: hidden;
+    background-color: #3a3c3e;
+    color: #fff;
+    text-align: justify;
+    border-radius: 5px;
+    padding: 5px;
+    position: fixed;
+    z-index: 1;
+    transition: opacity 0.3s ease;
+    max-width: 80%;
+    white-space: nowrap;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+}
 
-    .cloze {
-        color: #008792;
-        padding:0 10px;
-        border-bottom: solid;
-        font-family: kt;
-        font-weight: bold;
-        letter-spacing:0.002em
-    }
+.tooltip-content::after {
+    content: "";
+    position: absolute;
+    top: var(--tooltip-after-top, auto);
+    bottom: var(--tooltip-after-bottom, -8px);
+    left: 50%;
+    transform: translateX(-50%);
+    margin-left: var(--tooltip-after-left, 0px);
+    border: 8px solid transparent;
+    border-top: var(--tooltip-after-border-top, 8px solid #3a3c3e);
+    border-bottom: var(--tooltip-after-border-bottom, none);
+}
 
-    .slide {
-        position:relative;
-        -webkit-animation:slide 2s 0s;
-        -webkit-animation-fill-mode:forwards; }
+.slide {
+    position: relative;
+    -webkit-animation: slide 2s 0s forwards;
+}
 
-    @-webkit-keyframes slide {
-        0%      { opacity: 0;     top: 40px; }
-        100%        { opacity: 1;     top: 0px; }
-    }
+@-webkit-keyframes slide {
+    0% { opacity: 0; top: 40px; }
+    100% { opacity: 1; top: 0px; }
+}
+
+/* 夜间模式 */
+
+.card.nightMode {
+    color: #ebedec;
+    background: #121212;
+}
+
+.nightMode .question,
+.nightMode .answer {
+    color: #9ba6b2;
+}
+
+.nightMode .Tips {
+    border-top: 1px solid #f9a825;
+    color: #ebedec;
+    background:#1e1e1e;
+    box-shadow: 2px 2px 5px #000000;
+}
+
+.nightMode .cloze {
+    color: #2486b9
+}
+
+.nightMode .tooltip-container {
+    color: #121212;
+}
+
+@font-face {
+  font-family: 'Jiashu';
+  src: url("_HYJiaShu-55U.ttf");
+}
+
+@font-face {
+  font-family: 'SMontessori';
+  src: url("_SassoonMontessoriW01Regular.ttf");
+}
+
+@font-face {
+  font-family: 'Youkai';
+  src: url("_HYYouKai-55W.ttf");
+}
+
+@font-face {
+  font-family: 'SBook';
+  src: url("_SassoonBookW01Regular.ttf");
+}
 
 
-    /* 夜间模式 */
+@font-face {
+    font-family: 'Yasong';
+    src: url('_FZPingXYSK.TTF');
+}
 
-    .card.nightMode {
-        color: #ebedec;
-        background: #121212;
-    }
-
-    .nightMode .question {
-        color: #9ba6b2;
-    }
-
-    .nightMode .answer {
-        color: #9ba6b2;
-    }
-
-    .nightMode ti {
-        color: #121212;
-        background: #f9a825;
-    }
-
-    .nightMode .Tips {
-        border-top: 1px solid #f9a825;
-        color: #ebedec;
-        background:#1e1e1e;
-        box-shadow: 2px 2px 5px #000000;
-    }
-
-    .nightMode .cloze {
-        color: #2486b9
-    }
+@font-face {
+    font-family: 'georgia';
+    src: url('_georgia.ttf');
+}
 </style>
