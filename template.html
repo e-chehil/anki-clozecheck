@@ -4,29 +4,14 @@
 <div class="question">{{Front}}</div>
 
 <script>
-    document.querySelectorAll('.question, .answer').forEach((el) => {
+    document.querySelectorAll('.question').forEach((el) => {
         el.innerHTML = el.innerHTML.replace(
             /\[([^\]]+)\]\("([^"]+)"\)/g,
-            `<span class="tooltip-container">$1<span class="tooltip-content">$2</span></span>`
+            `<span class="tooltip-container" onclick="toggleTooltip(this, event)">$1<span class="tooltip-content">$2</span></span>`
         ).replace(
             /`((?:.|\r?\n)+?)`/g,
-            `<span class="cloze" onclick="toggleCloze(this)"><span class="key" style="opacity:0">$1</span><span class="entry" style="display:none;" contenteditable="true"></span></span>`
+            `<span class="cloze" onclick="toggleCloze(this)"><span class="key">$1</span><span class="entry" contenteditable="true"></span></span>`
         );
-
-        el.querySelectorAll('.tooltip-container').forEach((tooltip) => {
-            const tooltipContent = tooltip.querySelector('.tooltip-content');
-            tooltip.addEventListener('click', (e) => {    
-                if (tooltipContent.style.visibility === 'visible') {
-                    tooltipContent.style.opacity = 0;
-                    tooltipContent.style.visibility = 'hidden';
-                } else {
-                    adjustTooltipPosition(tooltip, tooltipContent);
-                    tooltipContent.style.visibility = 'visible';
-                    tooltipContent.style.opacity = 1;
-                }
-                e.stopPropagation();
-            });
-        });
     });
 
     document.addEventListener('click', () => {
@@ -35,6 +20,19 @@
             tooltipContent.style.visibility = 'hidden';
         });
     });
+
+    function toggleTooltip(tooltip, e) {
+        const tooltipContent = tooltip.querySelector('.tooltip-content');
+        if (tooltipContent.style.visibility === 'visible') {
+            tooltipContent.style.opacity = 0;
+            tooltipContent.style.visibility = 'hidden';
+        } else {
+            adjustTooltipPosition(tooltip, tooltipContent);
+            tooltipContent.style.visibility = 'visible';
+            tooltipContent.style.opacity = 1;
+        }
+        e.stopPropagation();
+    }
 
     function adjustTooltipPosition(tooltip, tooltipContent) {
         const tooltipRect = tooltip.getBoundingClientRect();
@@ -65,8 +63,15 @@
         const key = cloze.querySelector(".key");
         const entry = cloze.querySelector(".entry");
 
-        if (entry.style.display === "none") {
-            if (allowInput) {
+        if (allowInput) {
+            if (entry.style.display === "inline") {
+                entry.style.display = "none";
+                key.style.display = "inline";
+                requestAnimationFrame(() => {
+                    key.style.opacity = 1;
+                });
+            } else {
+                key.style.opacity = 0;
                 key.style.display = "none";
                 entry.style.display = "inline";
 
@@ -80,12 +85,10 @@
                     entry.focus();
                     attachEntryEvents(entry, key, cloze, allowSubmitOnEnter);
                 }
-            } else {
-                key.style.opacity = 1 - key.style.opacity;
             }
+
         } else {
-            entry.style.display = "none";
-            key.style.display = "inline";
+            key.style.opacity = 1 - key.style.opacity;
         }
     }
 
@@ -99,10 +102,9 @@
         });
 
         entry.onblur = () => {
-            const answer = entry.textContent.trim();
-            key.style.opacity = 1;
             entry.contentEditable = false;
-
+            const answer = entry.textContent.trim();
+            if (!answer) return;
             if (answer === key.textContent.trim()) {
                 entry.style.color = "SeaGreen";
                 entry.textContent = `${answer}✔`;
@@ -118,8 +120,7 @@
 
 <!-- 背面内容模板 -->
 
-<div class="qu">---- <i>Question</i> ----</div>
-<div class="question">{{Front}}</div>
+{{FrontSide}}
 
 <div class=slide>
 	{{#Back}}
@@ -132,128 +133,23 @@
 </div>
 
 <script>
-    document.querySelectorAll('.question, .answer').forEach((el) => {
+    document.querySelectorAll('.answer').forEach((el) => {
         el.innerHTML = el.innerHTML.replace(
             /\[([^\]]+)\]\("([^"]+)"\)/g,
-            `<span class="tooltip-container">$1<span class="tooltip-content">$2</span></span>`
+            `<span class="tooltip-container" onclick="toggleTooltip(this, event)">$1<span class="tooltip-content">$2</span></span>`
         ).replace(
             /`((?:.|\r?\n)+?)`/g,
-            `<span class="cloze" onclick="toggleCloze(this)"><span class="key" style="opacity:0">$1</span><span class="entry" style="display:none;" contenteditable="true"></span></span>`
+            `<span class="cloze" onclick="toggleCloze(this)"><span class="key">$1</span><span class="entry" contenteditable="true"></span></span>`
         );
-
-        el.querySelectorAll('.tooltip-container').forEach((tooltip) => {
-            const tooltipContent = tooltip.querySelector('.tooltip-content');
-            tooltip.addEventListener('click', (e) => {    
-                if (tooltipContent.style.visibility === 'visible') {
-                    tooltipContent.style.opacity = 0;
-                    tooltipContent.style.visibility = 'hidden';
-                } else {
-                    adjustTooltipPosition(tooltip, tooltipContent);
-                    tooltipContent.style.visibility = 'visible';
-                    tooltipContent.style.opacity = 1;
-                }
-                e.stopPropagation();
-            });
-        });
     });
-
-    document.addEventListener('click', () => {
-        document.querySelectorAll('.tooltip-content').forEach((tooltipContent) => {
-            tooltipContent.style.opacity = 0;
-            tooltipContent.style.visibility = 'hidden';
-        });
-    });
-
-    function adjustTooltipPosition(tooltip, tooltipContent) {
-        const tooltipRect = tooltip.getBoundingClientRect();
-        let contentRect = tooltipContent.getBoundingClientRect();
-        const pageWidth = window.innerWidth;
-
-        const defaultLeft = tooltipRect.left + (tooltipRect.width - contentRect.width) / 2;
-        const adjustedLeft = Math.max(10, Math.min(defaultLeft, pageWidth - contentRect.width - 10));
-        tooltipContent.style.left = `${adjustedLeft}px`;
-        tooltipContent.style.whiteSpace = 'normal';
-        contentRect = tooltipContent.getBoundingClientRect();
-
-        let adjustedTop = tooltipRect.top - contentRect.height - 10;
-        if (adjustedTop < 0) {
-            adjustedTop = tooltipRect.bottom + 10;
-            tooltipContent.style.setProperty('--tooltip-after-top', '-8px');
-            tooltipContent.style.setProperty('--tooltip-after-bottom', 'auto');
-            tooltipContent.style.setProperty('--tooltip-after-border-top', 'none');
-            tooltipContent.style.setProperty('--tooltip-after-border-bottom', '8px solid black');
-        }
-        tooltipContent.style.top = `${adjustedTop}px`;
-
-        const arrowOffset = defaultLeft - adjustedLeft;
-        tooltipContent.style.setProperty('--tooltip-after-left', `${arrowOffset}px`);
-    }
-
-    function toggleCloze(cloze, allowInput = true, allowSubmitOnEnter = false, allowRepeat = true) {
-        const key = cloze.querySelector(".key");
-        const entry = cloze.querySelector(".entry");
-
-        if (entry.style.display === "none") {
-            if (allowInput) {
-                key.style.display = "none";
-                entry.style.display = "inline";
-
-                if (allowRepeat) {
-                    entry.style.color = "";
-                    entry.textContent = "";
-                    entry.contentEditable = true;
-                }
-
-                if (entry.contentEditable === "true") {
-                    entry.focus();
-                    attachEntryEvents(entry, key, cloze, allowSubmitOnEnter);
-                }
-            } else {
-                key.style.opacity = 1 - key.style.opacity;
-            }
-        } else {
-            entry.style.display = "none";
-            key.style.display = "inline";
-        }
-    }
-
-    function attachEntryEvents(entry, key, cloze, allowSubmitOnEnter) {
-        entry.addEventListener("keydown", (event) => {
-            if (event.key === "Backspace") event.stopPropagation();
-            if (allowSubmitOnEnter && event.key === "Enter") {
-                event.preventDefault();
-                entry.blur();
-            }
-        });
-
-        entry.onblur = () => {
-            const answer = entry.textContent.trim();
-            key.style.opacity = 1;
-            entry.contentEditable = false;
-
-            if (answer === key.textContent.trim()) {
-                entry.style.color = "SeaGreen";
-                entry.textContent = `${answer}✔`;
-                cloze.onclick = null;
-            } else {
-                entry.style.color = "IndianRed";
-                entry.textContent = `${answer}✘`;
-            }
-        };
-    }
 
     document.querySelectorAll('.key').forEach((key) => {
-        key.style.opacity = 1;
-        key.style.display = "inline";
-    });
-
-    document.querySelectorAll('.entry').forEach((entry) => {
-        entry.style.display = "none";
+        requestAnimationFrame(() => {
+            key.style.opacity = 1;
+        });
     });
 
 </script>
-
-
 
 <!-- 样式 -->
 
@@ -308,6 +204,16 @@
     letter-spacing: 0.06em;
 }
 
+.key {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.entry {
+    display: none;
+    transition: color 0.3s ease-in-out;
+}
+
 .tooltip-container {
     line-height: normal;
     font-weight: bold;
@@ -328,6 +234,7 @@
 .tooltip-content {
     line-height: normal;
     font-weight: normal;
+    opacity: 0;
     visibility: hidden;
     background-color: #3a3c3e;
     color: #fff;
@@ -336,7 +243,7 @@
     padding: 5px;
     position: fixed;
     z-index: 1;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease-in-out;
     max-width: 80%;
     white-space: nowrap;
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
@@ -357,11 +264,11 @@
 
 .slide {
     position: relative;
-    -webkit-animation: slide 2s 0s forwards;
+    animation: slideIn 0.3s ease forwards;
 }
 
-@-webkit-keyframes slide {
-    0% { opacity: 0; top: 40px; }
+@keyframes slideIn {
+    0% { opacity: 0; top: 15px; }
     100% { opacity: 1; top: 0px; }
 }
 
