@@ -4,23 +4,6 @@
 <div class="question">{{Front}}</div>
 
 <script>
-    document.querySelectorAll('.question').forEach((el) => {
-        el.innerHTML = el.innerHTML.replace(
-            /\[([^\]]+)\]\("([^"]+)"\)/g,
-            `<span class="tooltip-container" onclick="toggleTooltip(this, event)">$1<span class="tooltip-content">$2</span></span>`
-        ).replace(
-            /`((?:.|\r?\n)+?)`/g,
-            `<span class="cloze" onclick="toggleCloze(this)"><span class="key">$1</span><span class="entry" contenteditable="true"></span></span>`
-        );
-    });
-
-    document.addEventListener('click', () => {
-        document.querySelectorAll('.tooltip-content').forEach((tooltipContent) => {
-            tooltipContent.style.opacity = 0;
-            tooltipContent.style.visibility = 'hidden';
-        });
-    });
-
     function toggleTooltip(tooltip, e) {
         const tooltipContent = tooltip.querySelector('.tooltip-content');
         if (tooltipContent.style.visibility === 'visible') {
@@ -104,11 +87,18 @@
         entry.onblur = () => {
             entry.contentEditable = false;
             const answer = entry.textContent.trim();
-            if (!answer) return;
+            if (!answer) {
+                entry.style.display = "none";
+                key.style.display = "inline";
+                requestAnimationFrame(() => {
+                    key.style.opacity = 1;
+                });
+                return;
+            }
             if (answer === key.textContent.trim()) {
                 entry.style.color = "SeaGreen";
                 entry.textContent = `${answer}✔`;
-                cloze.onclick = null;
+                cloze.removeAttribute("onclick");
             } else {
                 entry.style.color = "IndianRed";
                 entry.textContent = `${answer}✘`;
@@ -116,6 +106,22 @@
         };
     }
 
+    document.querySelectorAll('.question').forEach((el) => {
+        el.innerHTML = el.innerHTML.replace(
+            /\[([^\]]+)\]\^\(([^)]+)\)/g,
+            `<span class="tooltip-container" onclick="toggleTooltip(this, event)">$1<span class="tooltip-content">$2</span></span>`
+        ).replace(
+            /\{\{([^\}]+)\}\}/g,
+            `<span class="cloze" onclick="toggleCloze(this)"><span class="key">$1</span><span class="entry" contenteditable="true"></span></span>`
+        );
+    });
+
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.tooltip-content').forEach((tooltipContent) => {
+            tooltipContent.style.opacity = 0;
+            tooltipContent.style.visibility = 'hidden';
+        });
+    });
 </script>
 
 <!-- 背面内容模板 -->
@@ -135,10 +141,10 @@
 <script>
     document.querySelectorAll('.answer').forEach((el) => {
         el.innerHTML = el.innerHTML.replace(
-            /\[([^\]]+)\]\("([^"]+)"\)/g,
+            /\[([^\]]+)\]\^\(([^)]+)\)/g,
             `<span class="tooltip-container" onclick="toggleTooltip(this, event)">$1<span class="tooltip-content">$2</span></span>`
         ).replace(
-            /`((?:.|\r?\n)+?)`/g,
+            /\{\{([^\}]+)\}\}/g,
             `<span class="cloze" onclick="toggleCloze(this)"><span class="key">$1</span><span class="entry" contenteditable="true"></span></span>`
         );
     });
@@ -148,35 +154,31 @@
             key.style.opacity = 1;
         });
     });
-
 </script>
 
 <!-- 样式 -->
 
-<style type="text/css">
 .card {
-    padding: 10px 5px 15px;
+    margin: 0 auto;
+    padding: 20px 10px;
     font-family: 'Georgia', 'Yasong', Arial, serif;
     font-size: 25px;
     text-align: center;
     color: #000;
     background: #ebedec;
+    max-width: 35em;
 }
 
-.qu {
+.qu, .an {
     font-size: 30px;
     margin-bottom: 15px;
-}
-
-.an {
-    font-size: 30px;
-    margin: 15px 0;
 }
 
 .question, .answer {
     color: #4c5870;
     line-height: 1.6;
     text-align: left;
+    margin-bottom: 25px;
 }
 
 .Tips {
@@ -184,13 +186,12 @@
     padding: 15px;
     white-space: pre-line;
     font-size: 20px;
-    line-height: 30px;
+    line-height: 1.5;
     font-family: 'Sassoon Book', 'Youkai';
     text-align: left;
     color: #222831;
     background: #FFFFF2;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6);
-    margin-top: 15px;
 }
 
 .cloze {
@@ -218,17 +219,16 @@
     line-height: normal;
     font-weight: bold;
     text-align: center;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    display: inline-block;
     cursor: pointer;
-    padding: 2px 4px;
+    padding: 0.1em 0.2em;
     margin: 0 0.2em;
     background-color: rgb(209, 134, 71);
     color: #ebedec;
     border-radius: 16px;
     font-size: 64%;
     user-select: none;
+    vertical-align: middle;
 }
 
 .tooltip-content {
@@ -333,4 +333,3 @@
     font-family: 'georgia';
     src: url('_georgia.ttf');
 }
-</style>
