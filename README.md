@@ -1,8 +1,8 @@
 # Versatile Cloze & Basic Template for Anki
 
-## Description
-
 You can download the template on [AnkiWeb](https://ankiweb.net/shared/info/356679663)
+
+## Description
 
 ### Card Template Description
 
