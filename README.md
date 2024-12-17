@@ -1,4 +1,4 @@
-# A New Basic/Cloze Template for Answer Input and Verification in Anki
+# Versatile Cloze & Basic Template for Anki
 
 ## Description
 
