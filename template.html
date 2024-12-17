@@ -4,42 +4,42 @@
 <div class="question">{{Front}}</div>
 
 <script>
-    function toggleTooltip(tooltip, e) {
-        const tooltipContent = tooltip.querySelector('.tooltip-content');
-        if (tooltipContent.style.visibility === 'visible') {
-            tooltipContent.style.opacity = 0;
-            tooltipContent.style.visibility = 'hidden';
+    function toggleInfo(info, e) {
+        const infoContent = info.querySelector('.info-content');
+        if (infoContent.style.visibility === 'visible') {
+            infoContent.style.opacity = 0;
+            infoContent.style.visibility = 'hidden';
         } else {
-            adjustTooltipPosition(tooltip, tooltipContent);
-            tooltipContent.style.visibility = 'visible';
-            tooltipContent.style.opacity = 1;
+            adjustInfoPosition(info, infoContent);
+            infoContent.style.visibility = 'visible';
+            infoContent.style.opacity = 1;
         }
         e.stopPropagation();
     }
 
-    function adjustTooltipPosition(tooltip, tooltipContent) {
-        const tooltipRect = tooltip.getBoundingClientRect();
-        let contentRect = tooltipContent.getBoundingClientRect();
+    function adjustInfoPosition(info, infoContent) {
+        const infoRect = info.getBoundingClientRect();
+        let contentRect = infoContent.getBoundingClientRect();
         const pageWidth = window.innerWidth;
 
-        const defaultLeft = tooltipRect.left + (tooltipRect.width - contentRect.width) / 2;
+        const defaultLeft = infoRect.left + (infoRect.width - contentRect.width) / 2;
         const adjustedLeft = Math.max(10, Math.min(defaultLeft, pageWidth - contentRect.width - 10));
-        tooltipContent.style.left = `${adjustedLeft}px`;
-        tooltipContent.style.whiteSpace = 'normal';
-        contentRect = tooltipContent.getBoundingClientRect();
+        infoContent.style.left = `${adjustedLeft}px`;
+        infoContent.style.whiteSpace = 'normal';
+        contentRect = infoContent.getBoundingClientRect();
 
-        let adjustedTop = tooltipRect.top - contentRect.height - 10;
+        let adjustedTop = infoRect.top - contentRect.height - 10;
         if (adjustedTop < 0) {
-            adjustedTop = tooltipRect.bottom + 10;
-            tooltipContent.style.setProperty('--tooltip-after-top', '-8px');
-            tooltipContent.style.setProperty('--tooltip-after-bottom', 'auto');
-            tooltipContent.style.setProperty('--tooltip-after-border-top', 'none');
-            tooltipContent.style.setProperty('--tooltip-after-border-bottom', '8px solid black');
+            adjustedTop = infoRect.bottom + 10;
+            infoContent.style.setProperty('--info-after-top', '-8px');
+            infoContent.style.setProperty('--info-after-bottom', 'auto');
+            infoContent.style.setProperty('--info-after-border-top', 'none');
+            infoContent.style.setProperty('--info-after-border-bottom', '8px solid black');
         }
-        tooltipContent.style.top = `${adjustedTop}px`;
+        infoContent.style.top = `${adjustedTop}px`;
 
         const arrowOffset = defaultLeft - adjustedLeft;
-        tooltipContent.style.setProperty('--tooltip-after-left', `${arrowOffset}px`);
+        infoContent.style.setProperty('--info-after-left', `${arrowOffset}px`);
     }
 
     function toggleCloze(cloze, allowInput = true, allowSubmitOnEnter = false, allowRepeat = true) {
@@ -109,7 +109,7 @@
     document.querySelectorAll('.question').forEach((el) => {
         el.innerHTML = el.innerHTML.replace(
             /\[([^\]]+)\]\^\(([^)]+)\)/g,
-            `<span class="tooltip-container" onclick="toggleTooltip(this, event)">$1<span class="tooltip-content">$2</span></span>`
+            `<span class="info-container" onclick="toggleInfo(this, event)">$1<span class="info-content">$2</span></span>`
         ).replace(
             /\{\{([^\}]+)\}\}/g,
             `<span class="cloze" onclick="toggleCloze(this)"><span class="key">$1</span><span class="entry" contenteditable="true"></span></span>`
@@ -117,9 +117,9 @@
     });
 
     document.addEventListener('click', () => {
-        document.querySelectorAll('.tooltip-content').forEach((tooltipContent) => {
-            tooltipContent.style.opacity = 0;
-            tooltipContent.style.visibility = 'hidden';
+        document.querySelectorAll('.info-content').forEach((infoContent) => {
+            infoContent.style.opacity = 0;
+            infoContent.style.visibility = 'hidden';
         });
     });
 </script>
@@ -142,7 +142,7 @@
     document.querySelectorAll('.answer').forEach((el) => {
         el.innerHTML = el.innerHTML.replace(
             /\[([^\]]+)\]\^\(([^)]+)\)/g,
-            `<span class="tooltip-container" onclick="toggleTooltip(this, event)">$1<span class="tooltip-content">$2</span></span>`
+            `<span class="info-container" onclick="toggleInfo(this, event)">$1<span class="info-content">$2</span></span>`
         ).replace(
             /\{\{([^\}]+)\}\}/g,
             `<span class="cloze" onclick="toggleCloze(this)"><span class="key">$1</span><span class="entry" contenteditable="true"></span></span>`
@@ -215,7 +215,7 @@
     transition: color 0.3s ease-in-out;
 }
 
-.tooltip-container {
+.info-container {
     line-height: normal;
     font-weight: bold;
     text-align: center;
@@ -231,7 +231,7 @@
     vertical-align: middle;
 }
 
-.tooltip-content {
+.info-content {
     line-height: normal;
     font-weight: normal;
     opacity: 0;
@@ -249,17 +249,17 @@
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
 }
 
-.tooltip-content::after {
+.info-content::after {
     content: "";
     position: absolute;
-    top: var(--tooltip-after-top, auto);
-    bottom: var(--tooltip-after-bottom, -8px);
+    top: var(--info-after-top, auto);
+    bottom: var(--info-after-bottom, -8px);
     left: 50%;
     transform: translateX(-50%);
-    margin-left: var(--tooltip-after-left, 0px);
+    margin-left: var(--info-after-left, 0px);
     border: 8px solid transparent;
-    border-top: var(--tooltip-after-border-top, 8px solid #3a3c3e);
-    border-bottom: var(--tooltip-after-border-bottom, none);
+    border-top: var(--info-after-border-top, 8px solid #3a3c3e);
+    border-bottom: var(--info-after-border-bottom, none);
 }
 
 .slide {
@@ -295,11 +295,11 @@
     color: #2486b9
 }
 
-.nightMode .tooltip-container {
+.nightMode .info-container {
     color: #121212;
 }
 
-.nightMode .tooltip-content {
+.nightMode .info-content {
     box-shadow: none;
 }
 
